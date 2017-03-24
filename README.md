@@ -1,7 +1,7 @@
-# folder-synchronization
+# Socialcops Task
 Synchronizing the contents of two folders on different devices.
 
-# CheckList
+### CheckList
 
 - [x] Dropbox Integration
 - [ ] Upload Script
