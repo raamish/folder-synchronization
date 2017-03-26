@@ -1,3 +1,11 @@
+"""
+This script uses watchdog to periodically check for any modifications
+and uploads them to dropbox. This script can be run in the background
+manually, or run as a daemon, or specified as a cron job.
+The variable LOCAL_DIRECTORY can be set up in init.py to change the
+local directory to be synchronized.
+Other variables also can be initialized using init.py
+"""
 import os
 import dropbox
 import sys
@@ -14,25 +22,20 @@ client = dropbox.Dropbox(ACCESS_TOKEN)
 class UploadHandler(FileSystemEventHandler):
 	
 	#function to upload whenever a modification is observed
-    def on_modification(self,event):
+    def on_modified(self,event):
+        #looping over all the files and directories recursively
         for root, dirs, files in os.walk(LOCAL_DIRECTORY):
             for filename in files:
-                print (client.users_get_current_account())
                 full_path = os.path.join(root, filename)
-                server_path = local_path.replace("/home","")
-                server_path = DROPBOX_ROOT_DIRECTORY+server_path
+                SERVER_PATH = full_path.replace("/home/","")
+                #DROPBOX_ROOT_DIRECTORY can be changed in init.py
+                SERVER_PATH = DROPBOX_ROOT_DIRECTORY+SERVER_PATH
                 try:
-                    with open(local_path, 'rb') as f:
+                    with open(full_path, 'rb') as f:
                         data=f.read()
-                    client.files_upload(data, server_path, mode=dropbox.files.WriteMode.overwrite)
-                    print "File upload done"
+                    client.files_upload(data, SERVER_PATH, mode=dropbox.files.WriteMode.overwrite)
                 except Exception as e:
                     print e              
-        # f=open('test.txt')
-		# client.files_upload(f.read(),'/test.txt')
-		# for entry in client.files_list_folder('').entries:
-		#     print entry.name
-
 
 if __name__ == "__main__":
 
@@ -41,9 +44,10 @@ if __name__ == "__main__":
     observe = Observer()
     observe.schedule(event_handler, path=LOCAL_DIRECTORY, recursive=True)
     observe.start()
+    #Using a 1 second time delay for the observer
     try:
         while True:
         	time.sleep(1)
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
 		observe.stop()
     observe.join()
