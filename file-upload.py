@@ -4,7 +4,7 @@ and uploads them to dropbox. This script can be run in the background
 manually, or run as a daemon, or specified as a cron job.
 The variable LOCAL_DIRECTORY can be set up in init.py to change the
 local directory to be synchronized.
-Other variables also can be initialized using init.py
+Other variables can also be initialized using init.py
 """
 import os
 import dropbox
